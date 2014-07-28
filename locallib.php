@@ -31,6 +31,7 @@ require_once($CFG->libdir.'/csvlib.class.php');
 require_once("$CFG->libdir/accesslib.php");
 require_once("$CFG->libdir/enrollib.php");
 require_once("$CFG->libdir/grouplib.php");
+require_once("$CFG->dirroot/group/lib.php");
 
 /**
  * Validation callback function - verified the column line of csv file.
@@ -137,8 +138,8 @@ function parse_csv(csv_import_reader $cir, $csv_keys) {
             $data[$uid] = new stdClass();
             $data[$uid]->id = $uid;
             $data[$uid]->key = $key;
-            $data[$udi]->groups = array();
-            $data[$udi]->groups[] = $gid;
+            $data[$uid]->groups = array();
+            $data[$uid]->groups[] = $gid;
         }
     }
 
@@ -154,7 +155,7 @@ function parse_csv(csv_import_reader $cir, $csv_keys) {
  * @return none.
  */
 function enroll_action ($csvdata, $manual_enrol_instance, $role_id, $missing_act) {
-    global $COURSE;
+    global $DB, $COURSE;
 
     $coursecontext = context_course::instance($COURSE->id);
     $system_manual_enroll = enrol_get_plugin('manual');
@@ -170,13 +171,18 @@ function enroll_action ($csvdata, $manual_enrol_instance, $role_id, $missing_act
 
     // Withdraw/Suspend unlisted users
     if ($missing_act != 'nothing') {
+        // Get 'student' roleid
+        $student_roleid = $DB->get_record('role', array('shortname'=>'student'))->id;
         $enrolled_users = get_enrolled_users($coursecontext);
         foreach ($enrolled_users as $enrolled_user) {
             if (!array_key_exists($enrolled_user->id, $csvdata)) {
+                if ($DB->count_records('role_assignments', array('userid'=>$enrolled_user->id, 'roleid'=>$student_roleid, 'contextid'=>$coursecontext->id)) == 0) {
+                    continue;  // Skip non-student users
+                }
                 if ($missing_act == 'suspend') {
-                    $system_manual_enroll->update_user($manual_enrol_instance, $uid, 1);
+                    $system_manual_enroll->update_user_enrol($manual_enrol_instance, $enrolled_user->id, 1);
                 } else {
-                    $system_manual_enroll->unenrol_user($manual_enrol_instance, $uid);
+                    $system_manual_enroll->unenrol_user($manual_enrol_instance, $enrolled_user->id);
                 }
             }
         }
@@ -194,6 +200,8 @@ function group_action($csvdata, $autogroupcreate, $autogroupwithdraw) {
     global $DB, $COURSE;
 
     $coursecontext = context_course::instance($COURSE->id);
+    // Get 'student' roleid
+    $student_roleid = $DB->get_record('role', array('shortname'=>'student'))->id;
 
     foreach ($csvdata as $uid=>$userdata) {
         if (!is_enrolled($coursecontext, $uid)) {
@@ -232,7 +240,7 @@ function group_action($csvdata, $autogroupcreate, $autogroupwithdraw) {
         }
 
         // Withdraw from unlisted groups if required
-        if ($autogroupwithdraw) {
+        if ($autogroupwithdraw && ($DB->count_records('role_assignments', array('userid'=>$uid, 'roleid'=>$student_roleid)) > 0)) {
             // Get current groups that the user already in
             $sql = "SELECT g.id, g.name
                     FROM {groups} g JOIN {groups_members} gm ON gm.groupid = g.id
@@ -241,8 +249,8 @@ function group_action($csvdata, $autogroupcreate, $autogroupwithdraw) {
             $currentgroups = $DB->get_records_sql($sql, $params);
 
             // Iterate
-            foreach ($currentgroups as $gid=>$gname) {
-                if (! in_array($gname, $userdata->groups)) {
+            foreach ($currentgroups as $gid=>$currentgroup) {
+                if (! in_array($currentgroup->name, $userdata->groups)) {
                     groups_remove_member($gid, $uid);
                 }
             }

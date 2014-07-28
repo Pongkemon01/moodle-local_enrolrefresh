@@ -122,7 +122,7 @@ if ($mform->is_cancelled()) {
     }
 
     // Perform enrollment level action
-    if ($manual_enrol_instance != null && $formdata->role_id > 0 && $formdata->missing_act != 'nothing') {
+    if ($manual_enroll_instance != null && ($formdata->role_id > 0 || $formdata->missing_act != 'nothing')) {
         enroll_action($csvdata, $manual_enroll_instance, $formdata->role_id, $formdata->missing_act);
     }
 
