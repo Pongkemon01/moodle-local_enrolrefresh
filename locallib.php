@@ -97,7 +97,7 @@ function parse_csv(csv_import_reader $cir, $csv_keys) {
     $cir->init();
 
     // Get name of the key field
-    if (in_array ('username')) {
+    if (in_array ('username', $csv_keys)) {
         $keyname = 'username';
     } else {
         $keyname = 'idnumber';

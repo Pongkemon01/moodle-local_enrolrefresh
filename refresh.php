@@ -76,7 +76,7 @@ foreach($enrols_enabled as $enrol) {
 }
 
 $formdata = null;
-$mform    = new local_enrolrefresh_index_form(null, array('data' => $data));
+$mform    = new local_enrolrefresh_index_form($CFG->wwwroot . '/local/enrolrefresh/refresh.php?id=' . $COURSE->id, array('data' => $data));
 
 if ($mform->is_cancelled()) {
 
@@ -99,7 +99,7 @@ if ($mform->is_cancelled()) {
     $cir = new csv_import_reader($iid, local_enrolrefresh_index_form::$pluginname);
 
     // Verify basic imput CSV file
-    $content = $mform1->get_file_content('csvfile');
+    $content = $mform->get_file_content('csvfile');
     $csvlinecount = $cir->load_csv_content($content, $formdata->encoding, $formdata->delimiter_name);
     $csvloaderror = $cir->get_error();
     unset($content);
