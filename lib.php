@@ -39,7 +39,7 @@ require_once("$CFG->dirroot/group/lib.php");
  * @param global_navigation $navigation
  */
 /*
-function local_enrolrefresh_extends_navigation(global_navigation $navigation)
+function local_enrolrefresh_extend_navigation(global_navigation $navigation)
 {
 }
 */
@@ -52,7 +52,7 @@ function local_enrolrefresh_extends_navigation(global_navigation $navigation)
  * @param course_context      $context
  * @return void
  */
-function local_enrolrefresh_extends_settings_navigation(settings_navigation $navigation, $context)
+function local_enrolrefresh_extend_settings_navigation(settings_navigation $navigation, $context)
 {
     global $CFG;
 
