@@ -36,8 +36,8 @@ $course_id = required_param('id', PARAM_INT);
 // handle bogus course id values as well
 require_login($course_id);
 // $PAGE, $USER, $COURSE, and other globals now set
-// up, check the capabilities
-require_capability('moodle/course:managegroups', $PAGE->context);
+// up, check the capabilities (we need Manual Enrollment module)
+require_capability('enrol/manual:enrol', $PAGE->context);
 
 $user_context = context_user::instance($USER->id);
 $course_context = context_course::instance($COURSE->id);

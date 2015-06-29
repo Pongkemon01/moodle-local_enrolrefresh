@@ -48,6 +48,9 @@ function local_enrolrefresh_extend_navigation(global_navigation $navigation)
 /**
  * Hook to insert a link in settings navigation menu block
  *
+ * This function adds menu item under Couse administration->Users
+ * which exists only in course context.
+ *
  * @param settings_navigation $navigation
  * @param course_context      $context
  * @return void
@@ -59,6 +62,11 @@ function local_enrolrefresh_extend_settings_navigation(settings_navigation $navi
     // If not in a course context, then leave
     if ($context == null || $context->contextlevel != CONTEXT_COURSE) {
         return;
+    }
+    
+    // Ensure that the user has capability to enrol students
+    if( !has_capability( 'enrol/manual:enrol', $context->id, false ) ) {
+    	return;
     }
 
     // When on front page there is 'frontpagesettings' node, other

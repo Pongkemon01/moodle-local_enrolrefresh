@@ -30,9 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin             = new stdClass();
 
-$plugin->version    = 2014072701;
+$plugin->version    = 2015062900;
 $plugin->requires   = 2012062500;
-$plugin->release    = "0.0.1";
+$plugin->release    = "1.0.0";
 $plugin->component = 'local_enrolrefresh';
 $plugin->cron       = 0;
 $plugin->maturity   = MATURITY_STABLE;
