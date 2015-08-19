@@ -1,5 +1,5 @@
 <?php
-// This file is a part of Kasetsart Moodle Kit - https://github.com/Pongkemon01/moodle-quizaccess_studentident
+// This file is a part of Kasetsart Moodle Kit - https://github.com/Pongkemon01/moodle-local_enrolrefresh
 //
 // Kasetsart Moodle Kit is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -176,7 +176,8 @@ function enroll_action ($csvdata, $manual_enrol_instance, $role_id, $missing_act
         $enrolled_users = get_enrolled_users($coursecontext);
         foreach ($enrolled_users as $enrolled_user) {
             if (!array_key_exists($enrolled_user->id, $csvdata)) {
-                if ($DB->count_records('role_assignments', array('userid'=>$enrolled_user->id, 'roleid'=>$student_roleid, 'contextid'=>$coursecontext->id)) == 0) {
+                if ($DB->count_records('role_assignments', array('userid'=>$enrolled_user->id, 
+                						'roleid'=>$student_roleid, 'contextid'=>$coursecontext->id)) == 0) {
                     continue;  // Skip non-student users
                 }
                 if ($missing_act == 'suspend') {
@@ -240,7 +241,8 @@ function group_action($csvdata, $autogroupcreate, $autogroupwithdraw) {
         }
 
         // Withdraw from unlisted groups if required
-        if ($autogroupwithdraw && ($DB->count_records('role_assignments', array('userid'=>$uid, 'roleid'=>$student_roleid)) > 0)) {
+        if ($autogroupwithdraw && ($DB->count_records('role_assignments', array('userid'=>$uid, 
+        											  'roleid'=>$student_roleid)) > 0)) {
             // Get current groups that the user already in
             $sql = "SELECT g.id, g.name
                     FROM {groups} g JOIN {groups_members} gm ON gm.groupid = g.id
@@ -258,58 +260,3 @@ function group_action($csvdata, $autogroupcreate, $autogroupwithdraw) {
     }
 }
 
-// The following is for reference.
- /**
-  80   * Returns the groupid of a group with the name specified for the course.
-  81   * Group names should be unique in course
-  82   *
-  83   * @category group
-  84   * @param int $courseid The id of the course
-  85   * @param string $name name of group (without magic quotes)
-  86   * @return int $groupid
-  87   *
-  88  function groups_get_group_by_name($courseid, $name) {
-
-/**
- 222   * Add a new group
- 223   *
- 224   * @param stdClass $data group properties
- 225   * @param stdClass $editform
- 226   * @param array $editoroptions
- 227   * @return id of group or false if error
- 228   *
- 229  function groups_create_group($data, $editform = false, $editoroptions = false) {
-
- /**
-  32   * Adds a specified user to a group
-  33   *
-  34   * @param mixed $grouporid  The group id or group object
-  35   * @param mixed $userorid   The user id or user object
-  36   * @param string $component Optional component name e.g. 'enrol_imsenterprise'
-  37   * @param int $itemid Optional itemid associated with component
-  38   * @return bool True if user added successfully or the user is already a
-  39   * member of the group, false otherwise.
-  40   *
-  41  function groups_add_member($grouporid, $userorid, $component=null, $itemid=0) {
-
-   /**
- 348   * Determines if the user is a member of the given group.
- 349   *
- 350   * If $userid is null, use the global object.
- 351   *
- 352   * @category group
- 353   * @param int $groupid The group to check for membership.
- 354   * @param int $userid The user to check against the group.
- 355   * @return bool True if the user is a member, false otherwise.
- 356   *
- 357  function groups_is_member($groupid, $userid=null) {
-
- /**
- 174   * Deletes the link between the specified user and group.
- 175   *
- 176   * @param mixed $grouporid  The group id or group object
- 177   * @param mixed $userorid   The user id or user object
- 178   * @return bool True if deletion was successful, false otherwise
- 179   *
- 180  function groups_remove_member($grouporid, $userorid) {
- */
